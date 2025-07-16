@@ -1,6 +1,7 @@
 import matplotlib.pyplot as plt
 from typing import List
 from model.point import Point
+import numpy as np
 
 '''
     Classe de utilidades.
@@ -29,3 +30,36 @@ class Utils:
         ax.legend()
         ax.grid(True, alpha=0.3)
         fig.savefig('points.png')
+
+    def divide_hibrida(self, points, size_map, raio_radar):
+        regioes = {}
+    
+        
+        terrenos = {0: [], 1: [], 2: []}
+        for point in points:
+            terrenos[point.terrain_type].append(point)
+        
+
+        for terrain_type, terrain_points in terrenos.items():
+            if not terrain_points:
+                continue
+            
+            divisoes_x = max(1, int(size_map[0] / (2 * raio_radar)))
+            divisoes_y = max(1, int(size_map[1] / (2 * raio_radar)))
+            
+            largura_regiao = size_map[0] / divisoes_x
+            altura_regiao = size_map[1] / divisoes_y
+            
+            for i in range(divisoes_x):
+                for j in range(divisoes_y):
+                    regiao_id = f"T{terrain_type}_R{i}_{j}"
+                    regioes[regiao_id] = []
+            
+          
+            for point in terrain_points:
+                i = min(int(point.x // largura_regiao), divisoes_x - 1)
+                j = min(int(point.y // altura_regiao), divisoes_y - 1)
+                regiao_id = f"T{terrain_type}_R{i}_{j}"
+                regioes[regiao_id].append(point)
+        
+        return regioes
