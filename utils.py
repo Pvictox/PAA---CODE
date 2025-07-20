@@ -1,8 +1,9 @@
 import matplotlib.pyplot as plt
+import matplotlib
 from typing import List
 from model.point import Point
 import numpy as np
-
+matplotlib.use('Agg')  
 '''
     Classe de utilidades.
 '''
