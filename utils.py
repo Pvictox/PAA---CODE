@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 from typing import List
 from model.point import Point
 import numpy as np
+import math
 
 '''
     Classe de utilidades.
@@ -31,35 +32,33 @@ class Utils:
         ax.grid(True, alpha=0.3)
         fig.savefig('points.png')
 
-    def divide_hibrida(self, points, size_map, raio_radar):
-        regioes = {}
-    
-        
-        terrenos = {0: [], 1: [], 2: []}
-        for point in points:
-            terrenos[point.terrain_type].append(point)
-        
+    def calcular_area_total_aproximada(self, radares, raio_radar) :
 
-        for terrain_type, terrain_points in terrenos.items():
-            if not terrain_points:
-                continue
-            
-            divisoes_x = max(1, int(size_map[0] / (2 * raio_radar)))
-            divisoes_y = max(1, int(size_map[1] / (2 * raio_radar)))
-            
-            largura_regiao = size_map[0] / divisoes_x
-            altura_regiao = size_map[1] / divisoes_y
-            
-            for i in range(divisoes_x):
-                for j in range(divisoes_y):
-                    regiao_id = f"T{terrain_type}_R{i}_{j}"
-                    regioes[regiao_id] = []
-            
-          
-            for point in terrain_points:
-                i = min(int(point.x // largura_regiao), divisoes_x - 1)
-                j = min(int(point.y // altura_regiao), divisoes_y - 1)
-                regiao_id = f"T{terrain_type}_R{i}_{j}"
-                regioes[regiao_id].append(point)
+        '''
+            Dado a lista de radares posicionados, é calculado a área (aproximada) de cobertura.
+            PS: Sem medida. Não sei se consideramos metros ou KM (?)
+        '''
+
+        if not radares:
+            return 0.0
         
-        return regioes
+        x_min = min(r.x - raio_radar for r in radares)
+        x_max = max(r.x + raio_radar for r in radares)
+        y_min = min(r.y - raio_radar for r in radares) # Calculando limite dos eixos X e Y
+        y_max = max(r.y + raio_radar for r in radares)
+        
+        x_points = np.arange(x_min, x_max)
+        y_points = np.arange(y_min, y_max)
+        
+        area_coberta = 0.0
+
+        for x in x_points:
+            for y in y_points:
+            
+                for radar in radares:
+                    distancia = math.sqrt((x - radar.x)**2 + (y - radar.y)**2)
+                    if distancia <= raio_radar:
+                        area_coberta += 1 
+                        break  
+        
+        return area_coberta
